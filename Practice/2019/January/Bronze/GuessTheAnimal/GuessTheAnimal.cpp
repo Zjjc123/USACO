@@ -5,7 +5,7 @@ LANG: C++
 */
 
 /*
-Solution: To find the maximum number of guesses, its the most number of traits that is shared in ONE animal
+Solution: To find the maximum number of guesses, its the most number of traits that is shared between two animal
 
 
  */
@@ -17,20 +17,13 @@ Solution: To find the maximum number of guesses, its the most number of traits t
 
 int main()
 {
-    std::ifstream fin("TestData/2.in");
+    std::ifstream fin("guess.in");
 
     int numAnimals;
     fin >> numAnimals;
 
-    std::cout << "animals: " << numAnimals << std::endl;
-
-    // Stores the frequency of traits
-    // if frequency of traits is greater than 1 then it counts
-    std::map<std::string, int> traits;
-
-    // Stores the traits of animals (array of vectors of string)
-    // to later compare to frequency dictionary
-    std::vector<std::string> *animals[numAnimals];
+    // Stores the traits of animals (array of vectors pointers of string)
+    std::vector<std::string> * animals[numAnimals];
 
     for (int i = 0; i < numAnimals; i++)
     {
@@ -40,7 +33,6 @@ int main()
         fin >> name;
         fin >> numberOfTraits;
 
-        //std::cout << "number of traits: " << numberOfTraits << std::endl;
         animals[i] = new std::vector<std::string>;
         for (int j = 0; j < numberOfTraits; j++)
         {
@@ -49,62 +41,36 @@ int main()
 
             (*animals[i]).push_back(trait);
 
-            if (traits.count(trait))
-            {
-                traits[trait] = traits[trait] + 1;
-                //std::cout << "trait " << trait << " add 1" << std::endl;
-            }
-            else
-            {
-                traits.insert(std::pair<std::string, int>(trait, 1));
-                //std::cout << "add new trait: " << trait << std::endl;
-            }
         }
     }
 
-    int animalCountableTraits[numAnimals];
+    int max = 0;
 
-    std::map<std::string, int>::iterator it;
-
-    std::cout << "Comparing Traits" << std::endl;
-    for (int i = 0; i < numAnimals; i++)
+    // Comparing to find the max shared trait between two animals
+    for (int i = 0; i < (numAnimals - 1); i++)
     {
-        animalCountableTraits[i] = 0;
-        for (it = traits.begin(); it != traits.end(); it++)
+        for (int j = i + 1; j < numAnimals; j++)
         {
-            if ((it->second) > 1)
+            int temp = 0;
+            for (int k = 0; k < (*animals[i]).size(); k++)
             {
-                std::cout << "Test trait： " << it->first << std::endl;
-                //std::cout << it->first << " : " << it->second << std::endl;
-                std::cout << "animal " << i << ": " << (*animals[i]).size() << " ";
-                for (int j = 0; j < ((*animals[i]).size()); j++)
+                for (int l = 0; l < (*animals[j]).size(); l++)
                 {
-                    std::cout << (*animals[i])[j] << ", ";
-                    if ((*animals[i])[j] == (it->first))
+                    if ((*(animals[i]))[k] == (*(animals[j]))[l])
                     {
-
-                        animalCountableTraits[i]++;
+                        temp++;
                     }
                 }
-                std::cout << std::endl;
+            }
+            if (temp > max)
+            {
+                max = temp;
             }
         }
     }
 
-    int count = 0;
+    max++;
 
-    for (int i = 0; i < numAnimals; i++)
-    {
-        std::cout << animalCountableTraits[i] << std::endl;
-        if (animalCountableTraits[i] > count)
-        {
-            count = animalCountableTraits[i];
-        }
-    }
-
-    count += 1;
     std::ofstream fout("guess.out");
-    fout << count << std::endl;
-
-    std::cout << "count: " << count << std::endl;
+    fout << max << std::endl;
 }
