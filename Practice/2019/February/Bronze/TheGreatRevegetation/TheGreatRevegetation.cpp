@@ -5,21 +5,12 @@ LANG: C++
 */
 
 /*
-Keep adding 1 to field until everything is different
+Solution: Go from left to right, check every connection and eliminate unavaiable choices.
+Choose the smallest one for each field.s
  */
 
 #include <fstream>
 #include <iostream>
-
-bool isCorrect(int cows[][2], int fields[], int m)
-{
-    for (int i = 0; i < m; i++)
-    {
-        if (fields[cows[i][0] - 1] == fields[cows[i][1] - 1])
-            return false;
-    }
-    return true;
-}
 
 int main()
 {
@@ -29,18 +20,15 @@ int main()
 
     fin >> n >> m;
 
-    std::cout << "Fields: "  << n << std::endl;
+    std::cout << "Fields: " << n << std::endl;
     std::cout << "Cows: " << m << std::endl;
 
-    int cows [m][2];
+    int cows[m][2];
     int fields[n];
 
     for (int i = 0; i < m; i++)
     {
         fin >> cows[i][0] >> cows[i][1];
-        std::cout << "Cow "  << i << std::endl;
-        std::cout << cows[i][0] << std::endl;
-        std::cout << cows[i][1] << std::endl;
     }
 
     for (int i = 0; i < n; i++)
@@ -48,14 +36,32 @@ int main()
         fields[i] = 1;
     }
 
-    while (!isCorrect(cows, fields, m))
+    for (int i = 1; i < n; i++)
     {
-        for (int i = 0; i < m; i++)
+        int possible[5] = {0, 1, 2, 3, 4};
+        for (int j = 0; j < m; j++)
         {
-            if (fields[cows[i][0] - 1] == fields[cows[i][1] - 1])
+            if (cows[j][0] - 1 == i)
             {
-                fields[cows[i][1] - 1]++;
-                std::cout << "Add 1 to field "  << cows[i][1] << std::endl;
+                if (cows[j][1] - 1 < i)
+                {
+                    possible[fields[cows[j][1] - 1]] = 0;
+                }
+            }
+            if (cows[j][1] - 1 == i)
+            {
+                if (cows[j][0] - 1 < i)
+                {
+                    possible[fields[cows[j][0] - 1]] = 0;
+                }
+            }
+        }
+        for (int j = 1; j < 5; j++)
+        {
+            if (possible[j] != 0)
+            {
+                fields[i] = possible[j];
+                break;
             }
         }
     }
