@@ -5,8 +5,7 @@ LANG: C++
 */
 
 /*
-Solution: Go from left to right, check every connection and eliminate unavaiable choices.
-Choose the smallest one for each field.s
+Solution: A crap load of case work
  */
 
 #include <fstream>
@@ -40,15 +39,20 @@ int main()
     int bMax = 0;
     int bMinChange = 0;
     int bMaxChange = 0;
+    int bMinChangeStored = 0;
+    int bMaxChangeStored = 0;
+    bool bFirstNone = false;
     bool bNone = false;
+    bool bStoreMode = false;
 
     int eMin = 0;
     int eMax = 0;
     int eMinChange = 0;
     int eMaxChange = 0;
+    bool eFirstNone = false;
     bool eNone = false;
     for (int i = 0; i < n; i++)
-    {   
+    {
         String type;
         fin >> type;
 
@@ -56,8 +60,35 @@ int main()
         {
             if (bNone == false)
             {
-                bNone = true;
-                fin >> bMin >> bMax;
+                int bTempMin;
+                int bTempMax;
+                fin >> bTempMin >> bTempMax;
+                if (bFirstNone)
+                {
+                    if ((bTempMax - bTempMin) < (bMax - bMin))
+                    {
+                        bNone = true;
+                        bMin = bTempMin;
+                        bMax = bTempMax;
+                        bMinChange += bMinChangeStored;
+                        bMaxChange += bMaxChangeStored;
+                        bMinChangeStored = 0;
+                        bMaxChangeStored = 0;
+                        std::cout << "Override" << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "Ignore" << std::endl;
+                    }
+                }
+                else
+                {
+                    std::cout << "First None" << std::endl;
+                    bFirstNone = true;
+                    bNone = true;
+                    bMin = bTempMin;
+                    bMax = bTempMax;
+                }
             }
             else
             {
@@ -72,32 +103,50 @@ int main()
         {
             if (bNone == true)
             {
-                break;
+                bNone = false;
+                bStoreMode = true;
             }
             int bTempMin;
             int bTempMax;
             fin >> bTempMin >> bTempMax;
 
             // subtracting so flipped
-            bMinChange -= bTempMax;
-            bMaxChange -= bTempMin;
-
+            if (bStoreMode)
+            {
+                bMinChangeStored -= bTempMax;
+                bMaxChangeStored -= bTempMin;
+            }
+            else
+            {
+                bMinChange -= bTempMax;
+                bMaxChange -= bTempMin;
+            }
         }
         else if (type == "off")
         {
             if (bNone == true)
             {
-                break;
+                bNone = false;
+                bStoreMode = true;
             }
+
             int bTempMin;
             int bTempMax;
             fin >> bTempMin >> bTempMax;
 
-            bMinChange += bTempMin;
-            bMaxChange += bTempMax;
+            if (bStoreMode)
+            {
+                bMinChangeStored += bTempMin;
+                bMaxChangeStored += bTempMax;
+            }
+            else
+            {
+                bMinChange += bTempMin;
+                bMaxChange += bTempMax;
+            }
         }
     }
-        
+
     bMin += bMinChange;
     bMax += bMaxChange;
 
@@ -106,21 +155,40 @@ int main()
 
     std::cout << bMin << std::endl;
     std::cout << bMax << std::endl;
-    
+
     fin.seekg(0, std::ios::beg);
     fin >> n;
     for (int i = 0; i < n; i++)
-    {   
+    {
         String type;
         fin >> type;
         if (type == "none")
         {
             if (eNone == false)
             {
-                eNone = true;
-                fin >> eMin >> eMax;
-                eMinChange = 0;
-                eMaxChange = 0;
+                int eTempMin;
+                int eTempMax;
+                fin >> eTempMin >> eTempMax;
+                if (eFirstNone)
+                {
+                    if ((eTempMax - eTempMin) < (eMax - eMin))
+                    {
+                        eMin = eTempMin;
+                        eMax = eTempMax;
+                        eMinChange = 0;
+                        eMaxChange = 0;
+                        eNone = true;
+                    }
+                }
+                else
+                {
+                    eFirstNone = true;
+                    eMin = eTempMin;
+                    eMax = eTempMax;
+                    eMinChange = 0;
+                    eMaxChange = 0;
+                    eNone = true;
+                }
             }
             else
             {
@@ -140,10 +208,9 @@ int main()
             int eTempMin;
             int eTempMax;
             fin >> eTempMin >> eTempMax;
-            
+
             eMinChange += eTempMin;
             eMaxChange += eTempMax;
-
         }
         else if (type == "off")
         {
