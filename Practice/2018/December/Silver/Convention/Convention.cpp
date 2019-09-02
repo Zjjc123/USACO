@@ -52,12 +52,15 @@ bool PossibleCheck(int N, int M, int C, int target, const std::vector<int>& time
 
     }
     // If using more bus then not possible
-    //cout << "used: " << used << " busses: " << M << endl;
-    if (used > M && !(cowsOnBus.size() == 0))
+    //cout << "used: " << used << " busses: " << M << endl;\
+    // if just enough
+    if (used == M + 1 && cowsOnBus.size() == 0)
     {
         //cout << target << " is not a solution" << endl;
-        return false;
+        return true;
     }
+    else if (used > M)
+        return false;
     else
         return true;
 }
